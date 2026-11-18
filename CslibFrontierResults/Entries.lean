@@ -310,6 +310,7 @@ import CslibFrontier.Foundations.Data.Code.LowDegreeExtension
 import CslibFrontier.Computability.Complexity.Classes.BPP.Derandomization.NonExplicitPRG
 import CslibFrontier.Computability.Complexity.Classes.ArthurMerlin.Derandomization
 import CslibFrontier.Computability.Complexity.Problems.ModularSquareRoot
+import CslibFrontier.Computability.Automata.MPDA.WellNested
 
 /-!
 # Collected results
@@ -6905,3 +6906,20 @@ register_result "owf-iterate-not-one-way" where
     that is at least 2 for all large n. The draft's parametric Definition 10.1 is read \
     asymptotically; the draft's hint only asks for a counterexample, and the construction is \
     the library's own. Source check: independent review on PR #6278."
+
+register_result "mpda-well-nested-reachability" where
+  title := "Saturation computes well-nested reachability of multistack pushdown automata"
+  topic := "automata theory"
+  sources := [
+    { paper := AkshayGastinKrishnaRoychowdhury2020, theorem := "Lemma 1",
+      locator := "arXiv:2002.05950v2, Section 3, paragraph \"Binary well-nested reachability \
+        for MPDA\"; Algorithm 2 in Appendix B" }
+  ]
+  theorems := [Cslib.Automata.MPDA.wellNestedReach_iff]
+  scope := "For every MPDA, with no finiteness assumption, and all control states s and s': \
+    s' is related to s by WellNestedReach, the least relation containing the identity pairs \
+    and closed under prefixing a nop transition and under wrapping a matching push and pop of \
+    the same stack and symbol around a related pair, exactly when some well-nested sequence of \
+    transitions labels a run of the control from s to s'. WellNestedReach is the inductive \
+    form of the fixed point computed by Algorithm 2, which starts from the identity pairs and \
+    the nop transitions. Source check: pending independent review on the pull request."

@@ -968,6 +968,8 @@ public import CslibFrontier.Algorithms.WordRAM.ThreeSum.Host.Width
 public import CslibFrontier.Algorithms.WordRAM.ThreeSum.LowerBound
 public import CslibFrontier.Algorithms.WordRAM.ThreeSum.Memory
 public import CslibFrontier.Algorithms.WordRAM.ThreeSum.Weight
+public import CslibFrontier.Computability.Automata.MPDA.Basic
+public import CslibFrontier.Computability.Automata.MPDA.WellNested
 public import CslibFrontier.Computability.Automata.NA.Map
 public import CslibFrontier.Computability.BlumComplexity.Basic
 public import CslibFrontier.Computability.BlumComplexity.Cancellation

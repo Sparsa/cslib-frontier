@@ -25,8 +25,7 @@ multistep transitions applies directly to runs of the automaton.
 
 A word is accepted when some run starts in an initial state with all stacks empty and ends in an
 accepting state with all stacks empty, as in Section 2 of [AkshayGastinKrishnaRoychowdhury2020].
-The paper has a single initial state; we allow a set of initial states, as `NA` does. Silent moves
-are not built in: they are obtained by instantiating `Symbol` with `Option Σ`.
+The paper has a single initial state; we allow a set of initial states, as `NA` does.
 
 ## Main definitions
 

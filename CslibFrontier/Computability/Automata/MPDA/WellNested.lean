@@ -26,7 +26,8 @@ saturation computes exactly this relation.
 
 - `MPDA.WellNested`: well-nested sequences of transition labels.
 - `MPDA.WellNestedReach`: the least relation on control states that contains the identity, is
-  closed under prefixing `nop` transitions, and under prefixing a matching push/pop pair.
+  closed under prefixing `nop` transitions, and under prefixing a matching push/pop pair around a
+  related pair to a related pair.
 
 ## Main results
 
@@ -151,9 +152,12 @@ theorem configLTS_mTr_iff {w : List (Symbol × Op n Γ)} (hw : WellNested w)
 end WellNested
 
 /-- Well-nested reachability between control states: the least relation containing the identity
-and closed under prefixing a `nop` transition, and under prefixing a push, a well-nested segment,
-and the matching pop. This is the relation `WR` computed by the procedure `WellNestedReach`
-(Algorithm 2, Appendix B of [AkshayGastinKrishnaRoychowdhury2020]). -/
+and closed under prefixing a `nop` transition, and under `pushPop`: a push, a related pair, the
+matching pop, and then a second, independently related pair. The suffix gives concatenation, so
+two consecutive matched pairs are related. This is the inductive characterization of the relation
+`WR` that the procedure `WellNestedReach` (Algorithm 2, Appendix B of
+[AkshayGastinKrishnaRoychowdhury2020]) computes by iterating on a finite table until it
+stabilizes; that finite computation and its termination are not formalized here. -/
 inductive WellNestedReach (M : MPDA n State Symbol Γ) : State → State → Prop where
   | refl (s : State) : WellNestedReach M s s
   | nop {s₁ s₂ s₃ : State} {a : Symbol} :

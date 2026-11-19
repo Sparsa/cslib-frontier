@@ -438,6 +438,7 @@ import CslibFrontier.Computability.Complexity.Classes.ArthurMerlin.Derandomizati
 import CslibFrontier.Computability.Complexity.Classes.ArthurMerlin.SetLowerBound
 import CslibFrontier.Computability.Complexity.Problems.ModularSquareRoot
 import CslibFrontier.Computability.Automata.MPDA.OneHole
+import CslibFrontier.Computability.Automata.MPDA.ScopeHoles
 import CslibFrontier.Computability.Automata.MPDA.WellNested
 import CslibFrontier.Crypto.Computational.PseudorandomGenerator.ModReduction
 import CslibFrontier.Crypto.Computational.StatisticalIndistinguishability
@@ -11281,3 +11282,28 @@ register_result "bciks20-proximity-gap-affine-unique" where
     Johnson-bound affine dichotomy (eq. (1.3)) and Section 8 FRI obligations remain open in \
     #5968. Outside source check: \
     https://github.com/cslib-community/cslib-frontier/pull/6699#issuecomment-7031504400."
+
+register_result "mpda-scope-bounded-hole-bounded" where
+  title := "Complete scope-bounded runs of multistack pushdown automata are hole-bounded"
+  topic := "automata theory"
+  sources := [
+    { paper := AkshayGastinKrishnaRoychowdhury2020, theorem := "Proposition 2, first sentence",
+      locator := "arXiv:2002.05950v2, Section 2.1, Proposition 2 and the first paragraph of its \
+        proof, printed p. 6; contexts, rounds and scope as defined in Section 2, printed p. 4; \
+        holes as in Definition 1, printed p. 5" }
+  ]
+  theorems := [Cslib.Automata.MPDA.ScopeBounded.holeBounded,
+    Cslib.Automata.MPDA.RoundBounded.holeBounded]
+  scope := "For every MPDA and every run of its configuration system from a control state with \
+    all stacks empty to a control state with all stacks empty: if every push and its matching \
+    pop are separated by at most K context switches, the label sequence is K-hole-bounded; if \
+    the sequence has at most K rounds, it is (K * n)-hole-bounded, n being the number of \
+    stacks. Context-bounded sequences are scope-bounded with the same K \
+    (ContextBounded.scopeBounded), so K contexts give K holes. The source states K' <= K for \
+    rounds as well; for a fixed run, with scope measured in context switches as Section 2 \
+    defines it, that fails: the module client test CslibFrontierTests.MPDA.ScopeHoles gives a \
+    complete run on three stacks whose transition sequence has two rounds and three open \
+    holes. Hole counting is that of the mpda-one-hole-is-no-hole entry. Source check: \
+    independent agent review (reviewer-codex-edemaine) on PR #6615, against \
+    arXiv:2002.05950v2, printed pp. 4-6: \
+    https://github.com/cslib-community/cslib-frontier/pull/6615#pullrequestreview-5981924133."

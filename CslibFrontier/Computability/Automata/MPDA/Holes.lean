@@ -238,7 +238,7 @@ theorem HoleBounded.mono {K K' : ℕ} {w : List (α × Op n Γ)} (h : HoleBounde
 /-! ## Well-nested sequences have no holes -/
 
 /-- Every push of a well-nested sequence is closed by a well-nested continuation. -/
-private theorem WellNested.exists_wellMatched {w : List (α × Op n Γ)} (hw : WellNested w)
+theorem WellNested.exists_wellMatched {w : List (α × Op n Γ)} (hw : WellNested w)
     {p : ℕ} {i : Fin n} (hp : IsPushOn w i p) : WellMatched w p := by
   obtain ⟨a, γ, hp⟩ := hp
   induction hw generalizing p with

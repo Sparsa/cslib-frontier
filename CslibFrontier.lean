@@ -987,6 +987,8 @@ public import CslibFrontier.Algorithms.WordRAM.ThreeSum.Weight
 public import CslibFrontier.Computability.Automata.MPDA.Basic
 public import CslibFrontier.Computability.Automata.MPDA.Holes
 public import CslibFrontier.Computability.Automata.MPDA.OneHole
+public import CslibFrontier.Computability.Automata.MPDA.ScopeHoles
+public import CslibFrontier.Computability.Automata.MPDA.Underapprox
 public import CslibFrontier.Computability.Automata.MPDA.WellNested
 public import CslibFrontier.Computability.Automata.NA.Map
 public import CslibFrontier.Computability.BlumComplexity.Basic

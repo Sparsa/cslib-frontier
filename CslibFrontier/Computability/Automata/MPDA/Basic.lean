@@ -180,6 +180,9 @@ inductive OpKind (n : ℕ) where
 theorem Op.kind_eq_push {op : Op n Γ} {i : Fin n} : op.kind = .push i ↔ ∃ γ, op = .push i γ := by
   cases op <;> simp
 
+theorem Op.kind_eq_pop {op : Op n Γ} {i : Fin n} : op.kind = .pop i ↔ ∃ γ, op = .pop i γ := by
+  cases op <;> simp
+
 /-- A configuration of an MPDA: a control state and the contents of all stacks. -/
 @[ext]
 structure Config (n : ℕ) (State Γ : Type*) where

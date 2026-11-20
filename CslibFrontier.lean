@@ -988,6 +988,7 @@ public import CslibFrontier.Computability.Automata.DPDA.Basic
 public import CslibFrontier.Computability.Automata.MPDA.Basic
 public import CslibFrontier.Computability.Automata.MPDA.Holes
 public import CslibFrontier.Computability.Automata.MPDA.OneHole
+public import CslibFrontier.Computability.Automata.MPDA.PhaseSeparation
 public import CslibFrontier.Computability.Automata.MPDA.ScopeHoles
 public import CslibFrontier.Computability.Automata.MPDA.Separation
 public import CslibFrontier.Computability.Automata.MPDA.SeparationAutomaton

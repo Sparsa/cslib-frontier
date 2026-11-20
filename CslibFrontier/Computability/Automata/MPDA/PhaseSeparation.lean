@@ -466,31 +466,13 @@ private theorem phaseInv_step {q q' : PhaseState} {s₀ s₁ : List Unit} {u : L
     exact ⟨_, _, rfl, k, r, t' + 1, hrk, by omega, by omega,
       by simp [List.replicate_succ', List.append_assoc], h₀, by omega⟩
 
-private theorem phaseInv_of_run (μs : List (Letter × Op 2 Unit)) :
-    ∀ {c : Config 2 PhaseState Unit},
-      phaseAutomaton.configLTS.MTr ⟨.x, Stacks.pair [] []⟩ μs c →
-      ∃ s₀ s₁, c.contents = Stacks.pair s₀ s₁ ∧ PhaseInv c.state s₀ s₁ (μs.map Prod.fst) := by
-  induction μs using List.reverseRecOn with
-  | nil =>
-    intro c h
-    obtain rfl := LTS.MTr.nil_eq _ h
-    exact ⟨[], [], rfl, 0, rfl, rfl, rfl⟩
-  | append_singleton μs μ ih =>
-    intro c h
-    obtain ⟨c', h₁, h₂⟩ := LTS.MTr.split h
-    obtain ⟨s₀, s₁, hc', hinv⟩ := ih h₁
-    obtain ⟨q', σ'⟩ := c'
-    simp only at hc' hinv
-    subst hc'
-    obtain ⟨t₀, t₁, hσ, hinv'⟩ := phaseInv_step hinv ((LTS.MTr.singleton_iff _ _ _ _).mp h₂)
-    exact ⟨t₀, t₁, hσ, by simpa using hinv'⟩
-
 private theorem mem_phaseLanguage_of_accepts {w : List Letter}
     (h : Acceptor.Accepts phaseAutomaton w) : w ∈ phaseLanguage := by
   obtain ⟨s, hs, s', hs', μs, rfl, hrun⟩ := h
   obtain rfl : s = .x := hs
   rw [Stacks.empty_eq_pair] at hrun
-  obtain ⟨s₀, s₁, hc, hinv⟩ := phaseInv_of_run μs hrun
+  obtain ⟨s₀, s₁, hc, hinv⟩ :=
+    exists_inv_pair_of_configLTS_mTr PhaseInv phaseInv_step hrun ⟨0, rfl, rfl, rfl⟩
   obtain ⟨h₀, h₁⟩ := Stacks.eq_pair_iff.mp hc.symm
   replace h₀ : s₀ = [] := h₀
   replace h₁ : s₁ = [] := h₁

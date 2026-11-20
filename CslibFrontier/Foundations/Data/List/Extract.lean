@@ -25,6 +25,8 @@ concatenation of languages, split a factor at an intermediate position with it.
   `a ≤ b ≤ c`.
 * `List.extract_extract`: `(l.extract a b).extract c d = l.extract (a + c) (a + d)` for
   `a + d ≤ b`.
+* `List.extract_append_left`, `List.extract_append_right`: factors of an append that lie in one
+  of its parts.
 -/
 
 public section
@@ -61,5 +63,25 @@ theorem extract_extract {α : Type*} (l : List α) {a b c d : ℕ} (h : a + d �
   simp only [extract_eq_take_drop, drop_take, take_take, drop_drop]
   congr 1
   omega
+
+/-- Shifting both ends of a factor past a new head. -/
+theorem extract_cons_succ {α : Type*} (x : α) (l : List α) (a b : ℕ) :
+    (x :: l).extract (a + 1) (b + 1) = l.extract a b := by
+  simp [extract]
+
+/-- A factor of the right part of an append, with positions shifted by the left part. -/
+theorem extract_append_left {α : Type*} (l l' : List α) (a b : ℕ) :
+    (l ++ l').extract (l.length + a) (l.length + b) = l'.extract a b := by
+  rw [extract_eq_take_drop, extract_eq_take_drop, drop_append, drop_of_length_le (by omega),
+    nil_append, show l.length + a - l.length = a by omega,
+    show l.length + b - (l.length + a) = b - a by omega]
+
+/-- A factor that ends inside the left part of an append is a factor of the left part. -/
+theorem extract_append_right {α : Type*} (l l' : List α) {a b : ℕ} (hb : b ≤ l.length) :
+    (l ++ l').extract a b = l.extract a b := by
+  rw [extract_eq_take_drop, extract_eq_take_drop]
+  by_cases ha : a ≤ l.length
+  · rw [drop_append_of_le_length ha, take_append_of_le_length (by simp; omega)]
+  · rw [show b - a = 0 by omega, take_zero, take_zero]
 
 end List

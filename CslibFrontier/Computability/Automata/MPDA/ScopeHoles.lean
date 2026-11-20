@@ -7,7 +7,8 @@ Authors: Sparsa Roychowdhury
 module
 -- upstream: candidate
 
-public import CslibFrontier.Computability.Automata.MPDA.OneHole
+import CslibFrontier.Computability.Automata.MPDA.OneHole
+import CslibFrontier.Foundations.Data.List.Extract
 public import CslibFrontier.Computability.Automata.MPDA.Underapprox
 import Mathlib.Data.Finset.Max
 
@@ -369,7 +370,7 @@ theorem ScopeBounded.holeBounded {M : MPDA n State α Γ} {s s' : State} {w : Li
     have := hge b hb
     simp only at hab
     omega
-  have hcard := Splits.card_le (fun _ _ huv hv => IsContext.of_isInfix huv hv) (h r₁ m₁ hm₁)
+  have hcard := List.Splits.card_le (fun _ _ huv hv => IsContext.of_isInfix huv hv) (h r₁ m₁ hm₁)
     ((insert m₁ T).image (· - r₁)) ?hT ?hTP
   · rw [Finset.card_image_of_injOn hinj, Finset.card_insert_of_notMem (by
       simp only [T, Finset.mem_filter, Finset.mem_range]

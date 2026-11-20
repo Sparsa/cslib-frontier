@@ -8,7 +8,7 @@ module
 -- upstream: candidate
 
 public import CslibFrontier.Computability.Automata.MPDA.Holes
-public import CslibFrontier.Foundations.Data.List.Extract
+import CslibFrontier.Foundations.Data.List.Extract
 
 /-! # One hole is no hole
 
@@ -242,14 +242,14 @@ private theorem PendingAt.append_left (h : PendingAt v p x) (l : List (α × Op 
   obtain ⟨hpx, hx, j, hj, hk⟩ := h
   refine ⟨by omega, by simp; omega, j, IsPushOn.append_left hj l, ?_⟩
   rw [show l.length + p + 1 = l.length + (p + 1) by omega,
-    show l.length + x + 1 = l.length + (x + 1) by omega, extract_append_left]
+    show l.length + x + 1 = l.length + (x + 1) by omega, List.extract_append_left]
   exact hk
 
 private theorem PendingAt.append_right (h : PendingAt v p x) (r : List (α × Op n Γ)) :
     PendingAt (v ++ r) p x := by
   obtain ⟨hpx, hx, j, hj, hk⟩ := h
   refine ⟨hpx, by simp; omega, j, IsPushOn.append_right hj r, ?_⟩
-  rw [extract_append_right _ _ (by omega)]
+  rw [List.extract_append_right _ _ (by omega)]
   exact hk
 
 private theorem Crossing.append_left (h : Crossing v) (l : List (α × Op n Γ)) :
@@ -397,7 +397,7 @@ private theorem PendingAt.cons {v : List (α × Op n Γ)} {p x : ℕ} (h : Pendi
     (μ : α × Op n Γ) : PendingAt (μ :: v) (p + 1) (x + 1) := by
   obtain ⟨hpx, hx, j, hj, hk⟩ := h
   refine ⟨by omega, by simp; omega, j, IsPushOn.cons hj μ, ?_⟩
-  rw [extract_cons_succ]
+  rw [List.extract_cons_succ]
   exact hk
 
 /-- A push pending at `x` stays pending across a transition that does not pop its stack. -/

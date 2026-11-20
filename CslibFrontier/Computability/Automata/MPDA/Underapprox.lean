@@ -22,8 +22,8 @@ classes that hole-bounded sequences generalize:
 - `MPDA.RoundBounded`: at most `K` rounds, where a round is one possibly empty context for each
   stack `0, …, n - 1`, in this order.
 - `MPDA.ScopeBounded`: at most `K` context switches between a push and its matching pop.
-- `MPDA.PhaseBounded`: at most `K` phases, where a phase pops from at most one stack and may push
-  on any stack.
+- `MPDA.PhaseBounded`: at most `K` phases, where a phase pops from at most one stack (any two of
+  its pops use the same stack) and may push on any stack.
 
 ## Main definitions
 
@@ -118,18 +118,17 @@ theorem ContextBounded.scopeBounded {K : ℕ} {w : List (α × Op n Γ)} (h : Co
 
 /-! ## Phase-bounded sequences -/
 
-/-- A phase is a sequence of transitions that pops from at most one stack. It may push on any
-stack. -/
+/-- A phase is a sequence of transitions that pops from at most one stack: any two of its pops
+use the same stack. It may push on any stack, and a sequence without pops is a phase. -/
 @[expose] def IsPhase (w : List (α × Op n Γ)) : Prop :=
-  ∃ o : Fin n, ∀ μ ∈ w, ∀ i γ, μ.2 = .pop i γ → i = o
+  ∀ μ ∈ w, ∀ ν ∈ w, ∀ (i j : Fin n) (γ δ : Γ), μ.2 = .pop i γ → ν.2 = .pop j δ → i = j
 
 /-- At most `K` phases. -/
 @[expose] def PhaseBounded (K : ℕ) (w : List (α × Op n Γ)) : Prop := List.Splits IsPhase K w
 
 theorem IsPhase.of_isInfix {u w : List (α × Op n Γ)} (hu : u <:+: w) (h : IsPhase w) :
     IsPhase u :=
-  let ⟨o, ho⟩ := h
-  ⟨o, fun μ hμ => ho μ (hu.subset hμ)⟩
+  fun μ hμ ν hν => h μ (hu.subset hμ) ν (hu.subset hν)
 
 /-! ## Bounded acceptance -/
 

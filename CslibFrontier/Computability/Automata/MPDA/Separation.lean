@@ -79,13 +79,9 @@ private theorem not_isContext_extract {w : List (α × Op n Γ)} {a b s₁ s₂ 
     {i j : Fin n} (hij : i ≠ j) (h₁ : a ≤ s₁ ∧ s₁ < b) (h₂ : a ≤ s₂ ∧ s₂ < b)
     (hμ₁ : w[s₁]? = some μ₁) (hμ₂ : w[s₂]? = some μ₂) (hs₁ : μ₁.2.stack = some i)
     (hs₂ : μ₂.2.stack = some j) : ¬IsContext (w.extract a b) := by
-  have hmem : ∀ {s μ}, a ≤ s ∧ s < b → w[s]? = some μ → μ ∈ w.extract a b := by
-    intro s μ hs hμ
-    refine List.mem_of_getElem? (i := s - a) ?_
-    rw [List.extract_eq_take_drop, List.getElem?_take_of_lt (by omega), List.getElem?_drop,
-      Nat.add_sub_cancel' hs.1, hμ]
   rintro ⟨o, ho⟩
-  rcases ho μ₁ (hmem h₁ hμ₁) with h | h <;> rcases ho μ₂ (hmem h₂ hμ₂) with h' | h' <;>
+  rcases ho μ₁ (List.mem_extract_iff_getElem?.mpr ⟨s₁, h₁.1, h₁.2, hμ₁⟩) with h | h <;>
+    rcases ho μ₂ (List.mem_extract_iff_getElem?.mpr ⟨s₂, h₂.1, h₂.2, hμ₂⟩) with h' | h' <;>
     simp_all
 
 /-! ## The language `L_bh` -/

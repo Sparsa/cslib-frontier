@@ -11430,7 +11430,9 @@ register_result "mpda-hole-bounded-incomparable-phase-bounded" where
     language, of a finite visibly MPDA, but for every K it is not the K-hole-bounded language \
     of any visibly MPDA; the source's language L_bh is the 2-hole-bounded language of a finite \
     visibly MPDA, but for every K it is not the K-phase-bounded language of any visibly MPDA. A \
-    phase pops from at most one stack and may push on any, and K-phase-bounded means at most K \
-    phases. The statement is for visibly MPDAs, as in the source's argument; the \
-    hidden-operation version is open in the same sense as issue #6712. Source check: pending \
-    review on the pull request."
+    phase pops from at most one stack (any two of its pops use the same stack) and may push on \
+    any, and K-phase-bounded means at most K phases. The statement is for visibly MPDAs, as in \
+    the source's argument; the hidden-operation version is open in the same sense as issue \
+    #6712. Source check: outside-fleet agent review (reviewer-codex-edemaine) on PR #6722 at \
+    1ac952c6bf, against arXiv:2002.05950v2, printed pp. 4-7 and Appendix A.2, pp. 21-22: \
+    https://github.com/cslib-community/cslib-frontier/pull/6722#pullrequestreview-5993124585."

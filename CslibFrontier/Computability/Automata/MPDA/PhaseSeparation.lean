@@ -62,23 +62,9 @@ variable {n : ℕ} {State Γ α : Type*}
 private theorem not_isPhase_extract {w : List (α × Op n Γ)} {a b s₁ s₂ : ℕ} {μ₁ μ₂ : α × Op n Γ}
     {i j : Fin n} {γ₁ γ₂ : Γ} (hij : i ≠ j) (h₁ : a ≤ s₁ ∧ s₁ < b) (h₂ : a ≤ s₂ ∧ s₂ < b)
     (hμ₁ : w[s₁]? = some μ₁) (hμ₂ : w[s₂]? = some μ₂) (hp₁ : μ₁.2 = .pop i γ₁)
-    (hp₂ : μ₂.2 = .pop j γ₂) : ¬IsPhase (w.extract a b) := by
-  have hmem : ∀ {s μ}, a ≤ s ∧ s < b → w[s]? = some μ → μ ∈ w.extract a b := by
-    intro s μ hs hμ
-    refine List.mem_of_getElem? (i := s - a) ?_
-    rw [List.extract_eq_take_drop, List.getElem?_take_of_lt (by omega), List.getElem?_drop,
-      Nat.add_sub_cancel' hs.1, hμ]
-  rintro ⟨o, ho⟩
-  exact hij ((ho μ₁ (hmem h₁ hμ₁) i γ₁ hp₁).trans (ho μ₂ (hmem h₂ hμ₂) j γ₂ hp₂).symm)
-
-/-- An entry of a factor comes from a position inside the factor. -/
-private theorem exists_of_mem_extract {w : List α} {a b : ℕ} {μ : α} (h : μ ∈ w.extract a b) :
-    ∃ t, a ≤ t ∧ t < b ∧ w[t]? = some μ := by
-  obtain ⟨k, hk⟩ := List.mem_iff_getElem?.mp h
-  rw [List.extract_eq_take_drop, List.getElem?_take] at hk
-  split_ifs at hk with hkb
-  rw [List.getElem?_drop] at hk
-  exact ⟨a + k, by omega, by omega, hk⟩
+    (hp₂ : μ₂.2 = .pop j γ₂) : ¬IsPhase (w.extract a b) := fun h =>
+  hij (h μ₁ (List.mem_extract_iff_getElem?.mpr ⟨s₁, h₁.1, h₁.2, hμ₁⟩)
+    μ₂ (List.mem_extract_iff_getElem?.mpr ⟨s₂, h₂.1, h₂.2, hμ₂⟩) i j γ₁ γ₂ hp₁ hp₂)
 
 namespace HoleSeparation
 
@@ -89,7 +75,7 @@ variable {M : MPDA 2 State Letter Γ}
 /-- **`L_bh` is not phase-bounded**: a run of a visibly MPDA on `aᵐ bᵐ (c d)ᵐ` is not
 `K`-phase-bounded for `K < 2 * m`, since its `2 * m` pops alternate between the two stacks. This is
 the claim "`L_bh` is not k-phase bounded" in the proof of Proposition 2 of
-[AkshayGastinKrishnaRoychowdhury2020] (arXiv:2002.05950v2, Section 2.1, printed p. 6). -/
+[AkshayGastinKrishnaRoychowdhury2020] (arXiv:2002.05950v2, printed p. 7). -/
 theorem not_phaseBounded (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
     {w : List (Letter × Op 2 Γ)} (h : M.configLTS.MTr c w c') {m : ℕ}
     (hw : w.map Prod.fst = word m) {K : ℕ} (hK : K < 2 * m) : ¬PhaseBounded K w := by
@@ -188,7 +174,7 @@ private theorem phaseWord_cases {n t : ℕ} {x : Letter} (h : (phaseWord n)[t]? 
 /-- **`L'` is `2`-phase-bounded**: every run of a visibly MPDA on a word of `L'` splits into the
 phase `(a b)ⁿ cⁿ`, which pops only from stack `0`, and the phase `dⁿ`. This is the claim "`L'` is
 2-phase bounded" in the proof of Proposition 2 of [AkshayGastinKrishnaRoychowdhury2020]
-(arXiv:2002.05950v2, Section 2.1, printed p. 6). -/
+(arXiv:2002.05950v2, printed p. 7). -/
 theorem phaseBounded_two (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
     {w : List (Letter × Op 2 Γ)} (h : M.configLTS.MTr c w c')
     (hw : w.map Prod.fst ∈ phaseLanguage) : PhaseBounded 2 w := by
@@ -201,9 +187,12 @@ theorem phaseBounded_two (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
   have hphase : ∀ (u : List (Letter × Op 2 Γ)) (o : Fin 2), (∀ μ ∈ u, μ.2.kind = kind μ.1) →
       (∀ x ∈ u.map Prod.fst, ∀ i, kind x = .pop i → i = o) → IsPhase u := by
     intro u o hu hx
-    refine ⟨o, fun μ hμ i γ hpop => hx μ.1 (List.mem_map_of_mem hμ) i ?_⟩
-    rw [← hu μ hμ, hpop]
-    rfl
+    have hpop : ∀ μ ∈ u, ∀ i γ, μ.2 = .pop i γ → i = o := by
+      intro μ hμ i γ hpop
+      refine hx μ.1 (List.mem_map_of_mem hμ) i ?_
+      rw [← hu μ hμ, hpop]
+      rfl
+    exact fun μ hμ ν hν i j γ δ hμp hνp => (hpop μ hμ i γ hμp).trans (hpop ν hν j δ hνp).symm
   intro v hv
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hv
   rcases hv with rfl | rfl
@@ -253,7 +242,7 @@ private theorem net_of_ab {u : List (Letter × Op 2 Γ)} (hk : ∀ μ ∈ u, μ.
 private theorem ab_of_lt (hw : w.map Prod.fst = phaseWord n) {a b : ℕ} (hb : b ≤ 2 * n) :
     ∀ μ ∈ w.extract a b, μ.1 = .a ∨ μ.1 = .b := by
   intro μ hμ
-  obtain ⟨t, -, htb, ht⟩ := exists_of_mem_extract hμ
+  obtain ⟨t, -, htb, ht⟩ := List.mem_extract_iff_getElem?.mp hμ
   have hl : (phaseWord n)[t]? = some μ.1 := by rw [← hw, List.getElem?_map, ht]; rfl
   rcases phaseWord_cases hl with ⟨-, h⟩ | ⟨h₁, -, -⟩ | ⟨h₁, -, -⟩
   · split_ifs at h <;> simp [h]
@@ -264,7 +253,7 @@ private theorem ab_of_lt (hw : w.map Prod.fst = phaseWord n) {a b : ℕ} (hb : b
 for `K < n`. After `(a b)ⁿ`, each pending `a` is a hole push, since the `b` after it stays pending
 until after its matching `c`, and two pending `a`s never belong to the same hole, since a `b`
 separates them. This is the claim "`L'` is not hole-bounded" in the proof of Proposition 2 of
-[AkshayGastinKrishnaRoychowdhury2020] (arXiv:2002.05950v2, Section 2.1, printed p. 6). -/
+[AkshayGastinKrishnaRoychowdhury2020] (arXiv:2002.05950v2, printed p. 7). -/
 theorem not_holeBounded (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
     (h : M.configLTS.MTr c w c') (hw : w.map Prod.fst = phaseWord n) {K : ℕ} (hK : K < n) :
     ¬HoleBounded K w := by
@@ -304,11 +293,6 @@ theorem not_holeBounded (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
       · simpa [show (2 * i + 1) % 2 = 1 by omega] using h
       · omega
       · omega
-    have hνmem : ∀ a b, a ≤ 2 * i + 1 → 2 * i + 1 < b → ν ∈ w.extract a b := by
-      intro a b ha hb'
-      refine List.mem_of_getElem? (i := 2 * i + 1 - a) ?_
-      rw [List.extract_eq_take_drop, List.getElem?_take_of_lt (by omega), List.getElem?_drop,
-        Nat.add_sub_cancel' ha, hν]
     have hpend : PendingAt w (2 * i) (2 * n - 1) := by
       refine ⟨by omega, by omega, 0, ⟨μ.1, γ, hpush⟩, fun k => ?_⟩
       refine (net_of_ab (fun μ hμ => hkext _ _ μ (List.mem_of_mem_take hμ))
@@ -335,14 +319,14 @@ theorem not_holeBounded (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
       rw [← w.extract_append_extract (show 2 * i ≤ 2 * n by omega) (show 2 * n ≤ m + 1 by omega),
         net_append] at hnet
       have h₁ := (net_of_ab (u := w.extract (2 * i) (2 * n)) (hkext _ _) (ab_of_lt hw le_rfl)).2
-        ⟨ν, hνmem (2 * i) (2 * n) (by omega) (by omega), hνb⟩
+        ⟨ν, List.mem_extract_iff_getElem?.mpr ⟨_, by omega, by omega, hν⟩, hνb⟩
       -- The factor from `2 * n` to `m` carries only `c`s, which do not touch stack `1`.
       have h₂ : net 1 (w.extract (2 * n) (m + 1)) = 0 := by
         rw [net_eq_of_kind (hkext _ _)]
         refine List.sum_eq_zero fun x hx => ?_
         obtain ⟨l, hl, rfl⟩ := List.mem_map.mp hx
         obtain ⟨μ', hμ', rfl⟩ := List.mem_map.mp hl
-        obtain ⟨t, ht₁, ht₂, ht⟩ := exists_of_mem_extract hμ'
+        obtain ⟨t, ht₁, ht₂, ht⟩ := List.mem_extract_iff_getElem?.mp hμ'
         rcases phaseWord_cases (hlet ht) with ⟨h, -⟩ | ⟨-, -, h⟩ | ⟨h, -⟩
         · omega
         · rw [h]
@@ -372,10 +356,8 @@ theorem not_holeBounded (hM : M.IsVisibly kind) {c c' : Config 2 State Γ}
         · simpa [show (2 * i - 1) % 2 = 1 by omega] using h
         · omega
         · omega
-      have hν'mem : ν' ∈ w.extract (p + 1) (2 * i) := by
-        refine List.mem_of_getElem? (i := 2 * i - 1 - (p + 1)) ?_
-        rw [List.extract_eq_take_drop, List.getElem?_take_of_lt (by omega), List.getElem?_drop,
-          Nat.add_sub_cancel' (by omega), hν']
+      have hν'mem : ν' ∈ w.extract (p + 1) (2 * i) :=
+        List.mem_extract_iff_getElem?.mpr ⟨_, by omega, by omega, hν'⟩
       have h₁ := (net_of_ab (u := w.extract (p + 1) (2 * i)) (hkext _ _)
         (ab_of_lt hw (by omega))).2 ⟨ν', hν'mem, hν'b⟩
       have := hwn.net_eq_zero 1

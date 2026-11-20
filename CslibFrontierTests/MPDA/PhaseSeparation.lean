@@ -14,7 +14,7 @@ import Mathlib.Tactic.FinCases
 encapsulation. A visibly MPDA has complete runs on `(a b)² c² d² ∈ L'` and on
 `a b c d ∈ L_bh`, so the hypotheses of `phaseBounded_two`, `not_holeBounded` and
 `not_phaseBounded` can hold: the first run is `2`-phase-bounded but not `1`-hole-bounded, and the
-second is not `1`-phase-bounded. -/
+second is not `1`-phase-bounded. With zero stacks, a single no-op step is one phase. -/
 
 set_option linter.privateModule false
 
@@ -80,6 +80,10 @@ private theorem abcd_run :
 /-- The run on `a b c d` is not `1`-phase-bounded: it pops from both stacks. -/
 example : ¬PhaseBounded 1 abcd :=
   not_phaseBounded visible_isVisibly abcd_run (m := 1) rfl (by decide)
+
+/-- With zero stacks, a single no-op step is one phase: a sequence without pops is a phase. -/
+example : PhaseBounded 1 [((), (.nop : Op 0 Unit))] :=
+  ⟨[[((), .nop)]], le_rfl, rfl, by simp [IsPhase]⟩
 
 /-- The automaton for `L'` accepts `(a b)ⁿ cⁿ dⁿ`. -/
 example (n : ℕ) : phaseWord n ∈ Acceptor.language phaseAutomaton :=

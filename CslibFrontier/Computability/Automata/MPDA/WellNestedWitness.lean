@@ -16,9 +16,10 @@ A pair `(s, s')` of the set `WR` of [AkshayGastinKrishnaRoychowdhury2020] is unr
 well-nested run of the control from `s` to `s'` (Algorithm 5 of Appendix C). The search
 `MPDA.wnWitness k` tries the closure rules of `WellNestedReach` with fuel `k`: the identity pair, a
 `nop` transition followed by a pair, and a push, a pair, the matching pop and a pair. Each rule
-recurses with one unit of fuel less, so the search always terminates. It succeeds on exactly the
-pairs of the `k`-th iterate of the fixed point that computes `WR` (`MPDA.wellNestedStep`), and so on
-every pair of `WR` with the fuel used for `WR` (`MPDA.wrWitness`).
+recurses with one unit of fuel less, so the search always terminates. A found sequence is a
+well-nested run, and the search succeeds on every pair of the `k`-th iterate of the fixed point
+that computes `WR` (`MPDA.wellNestedStep`). With the fuel used for `WR` (`MPDA.wrWitness`), it
+therefore succeeds exactly on the pairs of `WR`.
 
 Algorithm 5 as printed recurses on pairs chosen without such a measure: its last case may choose the
 pair it was called on, so it need not terminate. The fuel is the repair.

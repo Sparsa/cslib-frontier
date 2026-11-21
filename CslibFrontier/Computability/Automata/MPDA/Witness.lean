@@ -287,7 +287,8 @@ section BackwardSound
 variable {M : MPDA n State Symbol Γ} [∀ s μ s', Decidable (M.Tr s μ s')]
   [DecidablePred (· ∈ M.start)]
 
-theorem take_append_cons_drop {α : Type*} {l : List α} {j : ℕ} {x : α} (h : l[j]? = some x) :
+private theorem take_append_cons_drop {α : Type*} {l : List α} {j : ℕ} {x : α}
+    (h : l[j]? = some x) :
     l.take j ++ x :: l.drop (j + 1) = l := by
   obtain ⟨hj, rfl⟩ := List.getElem?_eq_some_iff.mp h
   conv_rhs => rw [← List.take_append_drop j l, List.drop_eq_getElem_cons hj]
@@ -433,7 +434,7 @@ section BackwardComplete
 variable {M : MPDA n State Symbol Γ} [∀ s μ s', Decidable (M.Tr s μ s')]
   [DecidablePred (· ∈ M.start)]
 
-theorem isSome_bind_map {α β γ : Type*} {a : Option α} {b : Option β} (f : α → β → γ)
+private theorem isSome_bind_map {α β γ : Type*} {a : Option α} {b : Option β} (f : α → β → γ)
     (ha : a.isSome) (hb : b.isSome) : (a.bind fun x => b.map (f x)).isSome := by
   obtain ⟨x, rfl⟩ := Option.isSome_iff_exists.mp ha
   obtain ⟨y, rfl⟩ := Option.isSome_iff_exists.mp hb

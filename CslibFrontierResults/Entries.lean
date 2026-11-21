@@ -12139,10 +12139,10 @@ register_result "mpda-hole-bounded-emptiness" where
     printed-start variant answers true and repaired Algorithm 1 false. There the initial state \
     has no push and no pop, so the variant only opens empty holes there, and the well-nested \
     acceptance check of line 3 cannot pass the crossing pushes and pops. Theorem 1 states \
-    termination and correctness; the complexity bound given in the paragraph after it and \
-    witness generation are not formalized. Source check: outside-fleet agent review \
-    (reviewer-codex-edemaine) on PR #6748 at 884b0de71e, against arXiv:2002.05950v2, printed \
-    pp. 5, 8, 10 and 22-23: \
+    termination and correctness; the complexity bound given in the paragraph after it is \
+    not formalized, and witness generation is the entry mpda-hole-bounded-witness. Source \
+    check: outside-fleet agent review (reviewer-codex-edemaine) on PR #6748 at 884b0de71e, \
+    against arXiv:2002.05950v2, printed pp. 5, 8, 10 and 22-23: \
     https://github.com/cslib-community/cslib-frontier/pull/6748#pullrequestreview-5998692474."
 
 register_result "mpda-hole-bounded-witness" where
@@ -12172,4 +12172,7 @@ register_result "mpda-hole-bounded-witness" where
     until they stabilize and takes each predecessor from the previous round, so it needs no \
     parent pointers. The module client test CslibFrontierTests.MPDA.Witness evaluates the \
     witness on a two-stack MPDA whose accepting runs all have two holes: none for K = 1, an \
-    accepting run for K = 2. Source check: pending."
+    accepting run for K = 2. Source check: outside-fleet agent review \
+    (reviewer-codex-edemaine) on PR #6997 at cf522d35ed, against arXiv:2002.05950v2, printed \
+    pp. 11-12 and 24-25: \
+    https://github.com/cslib-community/cslib-frontier/pull/6997#pullrequestreview-6007294100."

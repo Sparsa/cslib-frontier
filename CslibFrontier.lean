@@ -1030,6 +1030,8 @@ public import CslibFrontier.Computability.Automata.MPDA.Separation
 public import CslibFrontier.Computability.Automata.MPDA.SeparationAutomaton
 public import CslibFrontier.Computability.Automata.MPDA.Underapprox
 public import CslibFrontier.Computability.Automata.MPDA.WellNested
+public import CslibFrontier.Computability.Automata.MPDA.WellNestedWitness
+public import CslibFrontier.Computability.Automata.MPDA.Witness
 public import CslibFrontier.Computability.Automata.NA.Map
 public import CslibFrontier.Computability.BlumComplexity.Basic
 public import CslibFrontier.Computability.BlumComplexity.Cancellation

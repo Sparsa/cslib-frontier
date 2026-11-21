@@ -95,7 +95,7 @@ theorem atomicWitness_spec {i : Fin n} {s t : State} {γ : Γ} {u : List (Symbol
   exact ⟨a, s₁, ws, rfl, hT, hwn, hrun⟩
 
 theorem isSome_atomicWitness {i : Fin n} {s t : State} {γ : Γ}
-    (h : (s, γ, t) ∈ M.atomicHoles i) : (M.atomicWitness i s γ t).isSome := by
+    (h : ⟨s, γ, t⟩ ∈ M.atomicHoles i) : (M.atomicWitness i s γ t).isSome := by
   obtain ⟨a, s₁, hT, hwn⟩ := (mem_atomicHoles M).mp h
   refine List.findSome?_isSome_iff.mpr ⟨(a, s₁), FinEnum.mem_toList _, ?_⟩
   dsimp only
@@ -214,7 +214,7 @@ variable (M : MPDA n State Symbol Γ) [∀ s μ s', Decidable (M.Tr s μ s')]
 /-- The lists `rs` realize the hole triples `holes`, one by one. -/
 @[expose] def RealizesAll (rs : List (List (Γ × State))) (holes : List (HoleTriple n State)) :
     Prop :=
-  List.Forall₂ (fun r ((i, s, s') : HoleTriple n State) => M.Realizes i s s' r) rs holes
+  List.Forall₂ (fun r (h : HoleTriple n State) => M.Realizes h.stack h.src h.dst r) rs holes
 
 /-- A list without holes reached by a well-nested run from an initial state. -/
 @[expose] def initWitness (μ : HoleList n State) : Option (List (Symbol × Op n Γ)) :=
@@ -228,7 +228,7 @@ variable (M : MPDA n State Symbol Γ) [∀ s μ s', Decidable (M.Tr s μ s')]
     (rec : HoleList n State → List (List (Γ × State)) → Option (List (Symbol × Op n Γ)))
     (μ : HoleList n State) (rs : List (List (Γ × State))) : Option (List (Symbol × Op n Γ)) :=
   match μ.holes.reverse, rs.reverse with
-  | (i, s, t) :: hs, r :: rs' =>
+  | ⟨i, s, t⟩ :: hs, r :: rs' =>
     if (⟨hs.reverse, s⟩ : HoleList n State) ∈ R ∧ t = μ.last ∧ hs.length < K then
       (rec ⟨hs.reverse, s⟩ rs'.reverse).bind fun w => (M.blockWitness i s r).map (w ++ ·)
     else none
@@ -240,13 +240,13 @@ larger hole, whose realization adds the popped atomic segment. -/
     (rec : HoleList n State → List (List (Γ × State)) → Option (List (Symbol × Op n Γ)))
     (μ : HoleList n State) (rs : List (List (Γ × State))) : Option (List (Symbol × Op n Γ)) :=
   (List.range μ.holes.length).findSome? fun j =>
-    match μ.holes[j]?, rs[j]? with
-    | some (i, s₁, s₂), some r =>
+    match (μ.holes[j]? : Option (HoleTriple n State)), rs[j]? with
+    | some ⟨i, s₁, s₂⟩, some r =>
       (FinEnum.toList (Γ × State × State × State × Symbol)).findSome? fun (γ, s₃, ℓ, ℓ', b) =>
-        if M.Tr ℓ (b, .pop i γ) ℓ' ∧ (∀ h ∈ μ.holes.drop (j + 1), h.1 ≠ i) ∧
-            (⟨μ.holes.take j ++ (i, s₁, s₃) :: μ.holes.drop (j + 1), ℓ⟩ : HoleList n State) ∈ R ∧
-            (s₂, γ, s₃) ∈ M.atomicHoles i then
-          (rec ⟨μ.holes.take j ++ (i, s₁, s₃) :: μ.holes.drop (j + 1), ℓ⟩
+        if M.Tr ℓ (b, .pop i γ) ℓ' ∧ (∀ h ∈ μ.holes.drop (j + 1), h.stack ≠ i) ∧
+            (⟨μ.holes.take j ++ ⟨i, s₁, s₃⟩ :: μ.holes.drop (j + 1), ℓ⟩ : HoleList n State) ∈ R ∧
+            ⟨s₂, γ, s₃⟩ ∈ M.atomicHoles i then
+          (rec ⟨μ.holes.take j ++ ⟨i, s₁, s₃⟩ :: μ.holes.drop (j + 1), ℓ⟩
             (rs.take j ++ ((γ, s₃) :: r) :: rs.drop (j + 1))).bind fun w =>
               (M.wrWitness ℓ' μ.last).map fun v => w ++ (b, .pop i γ) :: v
         else none
@@ -260,10 +260,10 @@ larger hole, whose realization adds the popped atomic segment. -/
   (List.range (μ.holes.length + 1)).findSome? fun j =>
     (FinEnum.toList (Fin n × State × Γ × State × State × State × Symbol)).findSome?
       fun (i, s₁, γ, s₃, ℓ, ℓ', b) =>
-        if M.Tr ℓ (b, .pop i γ) ℓ' ∧ (∀ h ∈ μ.holes.drop j, h.1 ≠ i) ∧
-            (⟨μ.holes.take j ++ (i, s₁, s₃) :: μ.holes.drop j, ℓ⟩ : HoleList n State) ∈ R ∧
-            (s₁, γ, s₃) ∈ M.atomicHoles i then
-          (rec ⟨μ.holes.take j ++ (i, s₁, s₃) :: μ.holes.drop j, ℓ⟩
+        if M.Tr ℓ (b, .pop i γ) ℓ' ∧ (∀ h ∈ μ.holes.drop j, h.stack ≠ i) ∧
+            (⟨μ.holes.take j ++ ⟨i, s₁, s₃⟩ :: μ.holes.drop j, ℓ⟩ : HoleList n State) ∈ R ∧
+            ⟨s₁, γ, s₃⟩ ∈ M.atomicHoles i then
+          (rec ⟨μ.holes.take j ++ ⟨i, s₁, s₃⟩ :: μ.holes.drop j, ℓ⟩
             (rs.take j ++ [(γ, s₃)] :: rs.drop j)).bind fun w =>
               (M.wrWitness ℓ' μ.last).map fun v => w ++ (b, .pop i γ) :: v
         else none
@@ -368,7 +368,7 @@ theorem popBack_spec {K : ℕ} {R : Finset (HoleList n State)}
     cases hrest with
     | cons hr hrpost =>
     have hν : M.RealizesAll (rs.take j ++ ((γ, s₃) :: r) :: rs.drop (j + 1))
-        (holes.take j ++ (i, s₁, s₃) :: holes.drop (j + 1)) :=
+        (holes.take j ++ ⟨i, s₁, s₃⟩ :: holes.drop (j + 1)) :=
       List.rel_append hrpre (.cons (.cons hr hγ) hrpost)
     exact (hrec _ _ _ hν hw').pop (splitLastHole_eq_some_of hpost _) hlen hb hwn hvrun
   next => simp at h
@@ -399,7 +399,7 @@ theorem closeBack_spec {K : ℕ} {R : Finset (HoleList n State)}
     omega
   obtain ⟨hrpre, hrpost⟩ := List.Forall₂.split_of_length_eq hlen hrs
   have hν : M.RealizesAll (rs.take j ++ [(γ, s₃)] :: rs.drop j)
-      (holes.take j ++ (i, s₁, s₃) :: holes.drop j) :=
+      (holes.take j ++ ⟨i, s₁, s₃⟩ :: holes.drop j) :=
     List.rel_append hrpre (.cons (.cons .nil hγ) hrpost)
   exact (hrec _ _ _ hν hw').popClose (splitLastHole_eq_some_of hpost _) hlen hb hwn hvrun
 
@@ -514,12 +514,12 @@ theorem isSome_holeWitness {K : ℕ} :
           List.Forall₂.split_right_cons hrs
         unfold popBack
         refine List.findSome?_isSome_iff.mpr ⟨pre.length, List.mem_range.mpr (by simp), ?_⟩
-        have hh : (pre ++ (i, s₁, s₂) :: post)[pre.length]? = some (i, s₁, s₂) := by simp
+        have hh : (pre ++ ⟨i, s₁, s₂⟩ :: post)[pre.length]? = some ⟨i, s₁, s₂⟩ := by simp
         have hr' : (rpre ++ r :: rpost)[pre.length]? = some r := by rw [← hlen]; simp
         simp only [hh, hr']
         refine List.findSome?_isSome_iff.mpr ⟨(γ, s₃, ℓν, s', b), FinEnum.mem_toList _, ?_⟩
-        have ht : (pre ++ (i, s₁, s₂) :: post).take pre.length = pre := by simp
-        have hd : (pre ++ (i, s₁, s₂) :: post).drop (pre.length + 1) = post := by simp
+        have ht : (pre ++ ⟨i, s₁, s₂⟩ :: post).take pre.length = pre := by simp
+        have hd : (pre ++ ⟨i, s₁, s₂⟩ :: post).drop (pre.length + 1) = post := by simp
         have ht' : (rpre ++ r :: rpost).take pre.length = rpre := by rw [← hlen]; simp
         have hd' : (rpre ++ r :: rpost).drop (pre.length + 1) = rpost := by rw [← hlen]; simp
         simp only [ht, hd, ht', hd']

@@ -464,6 +464,7 @@ import CslibFrontier.Computability.Automata.MPDA.PhaseSeparation
 import CslibFrontier.Computability.Automata.MPDA.ScopeHoles
 import CslibFrontier.Computability.Automata.MPDA.Separation
 import CslibFrontier.Computability.Automata.MPDA.SeparationAutomaton
+import CslibFrontier.Computability.Automata.MPDA.Witness
 import CslibFrontier.Computability.Automata.MPDA.WellNested
 import CslibFrontier.Crypto.Computational.PseudorandomGenerator.ModReduction
 import CslibFrontier.Crypto.Computational.StatisticalIndistinguishability
@@ -12143,3 +12144,32 @@ register_result "mpda-hole-bounded-emptiness" where
     (reviewer-codex-edemaine) on PR #6748 at 884b0de71e, against arXiv:2002.05950v2, printed \
     pp. 5, 8, 10 and 22-23: \
     https://github.com/cslib-community/cslib-frontier/pull/6748#pullrequestreview-5998692474."
+
+register_result "mpda-hole-bounded-witness" where
+  title := "Generating a K-hole-bounded accepting run of an MPDA from the emptiness search"
+  topic := "automata theory"
+  sources := [
+    { paper := AkshayGastinKrishnaRoychowdhury2020, theorem := "Section 4 (witness generation)",
+      locator := "arXiv:2002.05950v2, Section 4 \"Generating a Witness\", printed p. 11; \
+        Appendix C, Algorithm 5 (well-nested witness generation, printed p. 24) and Algorithm 6 \
+        (non-well-nested witness generation, printed p. 25)" }
+  ]
+  theorems := [Cslib.Automata.MPDA.isSome_witness_iff, Cslib.Automata.MPDA.witness_spec]
+  scope := "For every MPDA whose control states, input letters and stack symbols are FinEnum \
+    types, with decidable transitions and initial and final states, and every K: the executable \
+    function witness K returns a sequence of transitions exactly when the search isEmpty K of \
+    the mpda-hole-bounded-emptiness entry answers false, and every returned sequence labels a \
+    run from an initial state with empty stacks to a final state with empty stacks and is \
+    K-hole-bounded. By Theorem 1 it therefore returns a run exactly when the K-hole-bounded \
+    language is not empty. The returned run need not be shortest. The run is built backwards \
+    from an accepting list as in Algorithm 6: each open hole carries its atomic hole segments, \
+    newest first, which play the role of the source's witness stacks, and each step back over \
+    AddPop or AddHole appends the corresponding pop or block. Two deviations. First, Algorithm \
+    5 is repaired: as printed, its last case may recurse on the pair it was called on, so the \
+    recursion need not terminate; the Lean search wnWitness recurses with fuel, and with the \
+    fuel used to compute WR it succeeds exactly on the pairs of WR. Second, the source \
+    backtracks along a recorded BFS tree; the Lean search recomputes the rounds of the search \
+    until they stabilize and takes each predecessor from the previous round, so it needs no \
+    parent pointers. The module client test CslibFrontierTests.MPDA.Witness evaluates the \
+    witness on a two-stack MPDA whose accepting runs all have two holes: none for K = 1, an \
+    accepting run for K = 2. Source check: pending."

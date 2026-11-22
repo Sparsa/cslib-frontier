@@ -10245,10 +10245,16 @@ register_result "mpda-well-nested-reachability" where
     and an independently related suffix (s4, s5) give the pair (s1, s5); the suffix supplies \
     the concatenation needed for consecutive matched pairs. This is the relational \
     characterization of the table computed by Algorithm 2, which starts from the identity pairs \
-    and the nop transitions; the finite iteration of Algorithm 2, its termination and the \
-    equality of its output with WellNestedReach are not formalized. Source check: outside-fleet \
-    agent review (review_6193_endpoint, codex-coord-20261111-1634) on PR #6474, against \
-    arXiv:2002.05950v2 Section 2 p. 4, Section 3 pp. 7-8 and Appendix B p. 22."
+    and the nop transitions. For finitely many control states, letters and stack symbols and a \
+    decidable transition relation, the module of the mpda-hole-bounded-emptiness entry also \
+    computes the table: the finite set wellNestedPairs iterates the closure rules of \
+    WellNestedReach as many times as there are pairs of states, and contains exactly the pairs \
+    related by WellNestedReach (mem_wellNestedPairs). Algorithm 2 instead alternates a \
+    transitive closure with a push-pop step until nothing changes; both reach the same least \
+    fixed point, and the order of rule applications and the number of iterations are not \
+    formalized. Source check: outside-fleet agent review (review_6193_endpoint, \
+    codex-coord-20261111-1634) on PR #6474, against arXiv:2002.05950v2 Section 2 p. 4, Section 3 \
+    pp. 7-8 and Appendix B p. 22."
 register_result "offline-dictionary-attack" where
   title := "The offline dictionary attack recovers a password in the dictionary, or one with the \
     same hash, with at most |D| hash evaluations"
@@ -11985,9 +11991,10 @@ register_result "mpda-hole-bounded-not-scope-bounded" where
     source's witness for unbounded scope is a^m b^m (a c^2 b d^2)^m; the Lean witness takes the \
     groups of L_bh with p = q = 0. The statement is for visibly MPDAs, as in the source's \
     argument; whether the separation holds when stack operations are hidden is open (issue \
-    #6712). The phase-bounded comparison in the last sentence of Proposition 2 is not \
-    formalized here. Source check: outside-fleet agent review (reviewer-codex-edemaine) on PR \
-    #6714 at 17f93ab43d, against arXiv:2002.05950v2, printed pp. 4-7: \
+    #6712). The phase-bounded comparison in the last sentence of Proposition 2 is the entry \
+    mpda-hole-bounded-incomparable-phase-bounded. Source check: outside-fleet agent review \
+    (reviewer-codex-edemaine) on PR #6714 at 17f93ab43d, against arXiv:2002.05950v2, printed \
+    pp. 4-7: \
     https://github.com/cslib-community/cslib-frontier/pull/6714#issuecomment-7037725174."
 
 register_result "linear-reductions-preserve-ptas" where
